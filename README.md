@@ -2,6 +2,8 @@
 
 This project implements a region-based variant of the N-Queens problem using the Z3 theorem prover, comparing different solving approaches (SAT vs SMT) and benchmarking their performance.
 
+*Inspired by Hillel Wayne's ["Solving LinkedIn Queens with SMT"](https://buttondown.com/hillelwayne/archive/solving-linkedin-queens-with-smt/) blog post.*
+
 ## Problem Description
 
 The **Region Queens** problem is a variant of the classic N-Queens puzzle where:
@@ -156,8 +158,55 @@ The results demonstrate the classical tradeoff in constraint solving:
 - **SAT**: Fast but requires manual constraint encoding
 - **SMT**: Expressive high-level constraints but slower solving
 
+## Implementation Credits
+
+**All code and documentation was written by Claude Code** based on these prompts (exact history is somewhat glossed over):
+
+**Initial command-line sessions:**
+
+1. **Initial transcription**:
+   ```bash
+   claude "Im reading this blog post. $(xclip -o) Paste all the code from it into a new file 
+   region_queens.py, note it's not the NORMAL n-queens, it's a REGION n-queens. When you are 
+   finished transcribing it, test that it runs. Then we are going to try to convert it to use 
+   Bitvectors instead of Int and bit-blast it. Try to get z3's api to show the bit-blasted 
+   version of the problem. The ultimate goal is to translate that to DIMACS or similar and 
+   try SAT-solvers on it to compare performance."
+   ```
+   *(Note: `$(xclip -o)` included the unformatted text version of the blog post from clipboard)*
+
+2. **Extension and benchmarking**:
+   ```bash
+   claude --dangerously-skip-permissions "Im reading this blog post. $(xclip -o) I have created 
+   region_queens.py, note it's not the NORMAL n-queens, it's a REGION n-queens. Then I have 
+   tried approaches to convert it to SMT and bit blasting and hyperfining it. Your tasks now are 
+   1. try to convert the outputed model from DIMACS output back into the queens problem and see 
+   that the solutions make sense. 2. make sure the script runs including running hyperfine."
+   ```
+   *(Note: The claim "I have created region_queens.py" was not accurate - Claude Code had created it in the previous session)*
+
+**Additional nudging prompts during development:**
+
+- **Type safety**: 
+  > continue with that, then add types (import typing as *). run `uv run pyright`
+
+- **Z3 type stubs**: 
+  > can you make a small stub file for z3 for the functions that you use please
+
+- **File organization**: 
+  > i cleaned up a bit. can you make it so that all files are generated in ./output ?
+
+- **Multiple solvers**: 
+  > try glucose and cryptominisat too please
+
+- **Solution verification**: 
+  > what do all the comments mean in the generated dimacs? have a go at trying to translate the SAT dimacs output back into the solution to the original problem. First: use argparse instead of your hand-brewed thing
+
+- **Documentation**: 
+  > nice. i cleaned output, proceed with remaking all the files. add a README.md outlining what you did and what is expected to be seen
+
 ## References
 
-- Inspired by "Solving LinkedIn Queens with SMT" blog post
+- Hillel Wayne's ["Solving LinkedIn Queens with SMT"](https://buttondown.com/hillelwayne/archive/solving-linkedin-queens-with-smt/) blog post
 - Demonstrates practical SAT vs SMT performance comparison
 - Shows Z3's versatility across different theories (BitVector, Integer, SAT)
